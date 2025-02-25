@@ -205,11 +205,11 @@ print(test.head())
 
 #%%
 # Check for features that perfectly predict the 'signed up' variable
-for column in bank_data.columns:
-    if column != 'signed up_1':
-        crosstab = pd.crosstab(bank_data[column], bank_data['signed up_1'])
-        if crosstab.max().max() == crosstab.sum().max():
-            print(f"Feature '{column}' perfectly predicts the 'signed up' variable.")
+#for column in bank_data.columns:
+#    if column != 'signed up_1':
+#        crosstab = pd.crosstab(bank_data[column], bank_data['signed up_1'])
+#        if crosstab.max().max() == crosstab.sum().max():
+#            print(f"Feature '{column}' perfectly predicts the 'signed up' variable.")
 
 #%%
 test = test.sort_values(by=['accu'], ascending=False)
