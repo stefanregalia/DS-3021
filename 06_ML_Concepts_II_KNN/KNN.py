@@ -121,16 +121,24 @@ test, val = train_test_split(test, test_size=0.5, stratify=test['signed up_1'])
 import random
 random.seed(1984)   # kNN is a random algorithm, so we use `random.seed(x)` to make results repeatable
 
-X_train = train.drop(['signed up_1'], axis=1).values
+X_train = train.drop(['signed up_1','signed up_0'], axis=1)
 y_train = train['signed up_1'].values
 
 neigh = KNeighborsClassifier(n_neighbors=9)
 neigh.fit(X_train, y_train)
 
+# Measure accuracy on the training data
+X_train = train.drop(['signed up_1'], axis=1)
+y_train = train['signed up_1'].values
+
+#%%
+#train_accuracy = neigh.score(X_train, y_train)
+#print(f"Training Accuracy: {train_accuracy}")
+
 #%%
 # now, we check the model's accuracy on the test data:
 
-X_val = val.drop(['signed up_1'], axis=1).values
+X_val = val.drop(['signed up_1'], axis=1)
 y_val = val['signed up_1'].values
 
 print(neigh.score(X_val, y_val))
@@ -194,6 +202,14 @@ test = pd.DataFrame({'k':list(range(1,22,2)),
 
 #%%
 print(test.head())
+
+#%%
+# Check for features that perfectly predict the 'signed up' variable
+#for column in bank_data.columns:
+#    if column != 'signed up_1':
+#        crosstab = pd.crosstab(bank_data[column], bank_data['signed up_1'])
+#        if crosstab.max().max() == crosstab.sum().max():
+#            print(f"Feature '{column}' perfectly predicts the 'signed up' variable.")
 
 #%%
 test = test.sort_values(by=['accu'], ascending=False)
