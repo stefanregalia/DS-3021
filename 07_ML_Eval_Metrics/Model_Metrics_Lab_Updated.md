@@ -8,11 +8,11 @@ Part 1. Using the [mushroom dataset](https://archive.ics.uci.edu/static/public/8
 
  - [Mushroom Documentation](https://archive.ics.uci.edu/dataset/848/secondary+mushroom+dataset)
 
-Part 2. Build a kNN model and evaluate the model using using the metrics discussed in class (Accuracy, TPR, FPR, F1, Cross Entropy, and ROC/AUC). Make sure to calculate the prevalence to provide a reference for some of these measures. Make sure to properly clean and prepare the data ahead of building the model.  
+Part 2. Build a kNN model, make sure to calculate the prevalence to provide a reference for some of these measures and to properly clean and prepare the data ahead of building the model. Evaluate the model using using the metrics discussed in class (Accuracy, TPR, FPR, F1, Cross Entropy, and ROC/AUC). What do these metrics tell you about the model?
 
 Part 3. In consideration of all the metrics you just used are there a few that seem more important given the question you are asking? Why?
 
-Part 4. Consider where miss-classification errors are occurring, is there a pattern? If so discuss this pattern and why you think this is the case. 
+Part 4. Consider where classification errors are occurring, is there a pattern? If so discuss this pattern and why you think this is the case. 
 
 Bonus. Use a metric we did not discuss in class (reference the sklearn model metrics documentation). Once you have the output, summarize in a sentence or two what the metric is and what it means in the context of your question.
 
