@@ -11,8 +11,8 @@ from sklearn.model_selection import train_test_split,GridSearchCV,RepeatedStrati
 from sklearn import metrics
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.preprocessing import OrdinalEncoder
-from sklearn.tree import DecisionTreeClassifier, export_graphviz 
-from sklearn.tree import plot_tree
+#from sklearn.tree import DecisionTreeClassifier, export_graphviz 
+from sklearn.tree import plot_tree # need to add this one
 
 # %% [markdown]
 # ### CART Example using Sklearn: Use a new Dataset, complete preprocessing, use three data
@@ -73,8 +73,8 @@ print(203/(1279+203)) #of excellent
 # %%
 #Before we start move forward, we have one more preprocessing step
 #We must encode text_rank to become a continuous variable as that is the only type sklearn decision trees can currently take
-#winequality[["text_rank"]] = OrdinalEncoder().fit_transform(winequality[["text_rank"]])
-#print(winequality["text_rank"].value_counts()) #nice
+winequality[["text_rank"]] = OrdinalEncoder().fit_transform(winequality[["text_rank"]])
+print(winequality["text_rank"].value_counts()) #nice
 
 # %% [markdown]
 # ## Splitting the Data
@@ -102,14 +102,14 @@ X_tune, X_test, y_tune, y_test = train_test_split(X_test,y_test,  train_size = 0
 # training data will be used to build the initial model must be set. As seen below:
 
 kf = RepeatedStratifiedKFold(n_splits=10, n_repeats =5, random_state=42)
-# number - number of folds
-# repeats - number of times the CV is repeated, takes the average of these repeat rounds
+# n_splits- number of folds
+# n_repeats - number of times the CV is repeated, takes the average of these repeat rounds
 
 # This essentially will split our training data into k groups. 
 # For each unique group it will hold out one as a test set and take the remaining groups as a training set. 
 # Then, it fits a model on the training set and evaluates it on the test set.
 # Retains the evaluation score and discards the model, 
-# then summarizes the skill of the model using the sample of model evaluation scores we choose
+# then summarizes the skill of the model using the average of model evaluation scores we choose
 
 # %%
 #What score do we want our model to be built on? Let's use:
@@ -147,7 +147,7 @@ param={"max_depth" : [1,2,3,4,5,6,7,8,9,10,11],
 cl= DecisionTreeClassifier(random_state=1000)
 
 #Set up search for best decisiontreeclassifier estimator across all of our folds based on roc_auc
-search = GridSearchCV(cl, param, scoring=scoring, n_jobs=5, cv=kf,refit='roc_auc')
+search = GridSearchCV(cl, param, scoring=scoring, n_jobs=1, cv=kf,refit='roc_auc')
 
 
 #%%
@@ -156,7 +156,7 @@ model = search.fit(X_train, y_train)
 
 # %% [markdown]
 # ## Let's see how we did
-
+print(model.cv_results_)
 # %%
 #Retrieve the best estimator out of all parameters passed, based on highest roc_auc
 best = model.best_estimator_
@@ -312,7 +312,7 @@ X_tune1, X_test1, y_tune1, y_test1 = train_test_split(X_test1,y_test1,  train_si
 
 # %%
 #define search, model, paramameters and scoring will be the same...
-search_eng = GridSearchCV(cl, param, scoring=scoring, n_jobs=-1, cv=kf,refit='roc_auc')
+search_eng = GridSearchCV(cl, param, scoring=scoring, n_jobs=1, cv=kf,refit='roc_auc')
 
 #execute search
 model_eng = search_eng.fit(X_train1, y_train1)
