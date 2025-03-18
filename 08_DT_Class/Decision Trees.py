@@ -12,6 +12,7 @@ from sklearn import metrics
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.tree import DecisionTreeClassifier, export_graphviz 
+from sklearn.tree import plot_tree
 
 # %% [markdown]
 # ### CART Example using Sklearn: Use a new Dataset, complete preprocessing, use three data
@@ -61,6 +62,11 @@ winequality["text_rank"]= winequality["text_rank"].replace(['good','average-ish'
 print(winequality["text_rank"].value_counts()) #Great!
 
 # %%
+# Encode text_rank to become a continuous variable
+winequality["text_rank"] = winequality["text_rank"].replace({'ave': 0, 'excellent': 1})
+print(winequality["text_rank"].value_counts()) # Check the encoding
+
+# %%
 #check the prevalence
 print(203/(1279+203)) #of excellent
 
@@ -92,22 +98,27 @@ X_tune, X_test, y_tune, y_test = train_test_split(X_test,y_test,  train_size = 0
 
 # %%
 #Three steps in building a ML model
-#Step 1: Cross validation process- the process by which the training data will be used to build the initial model must be set. As seen below:
+#Step 1: Cross validation process- the process by which the 
+# training data will be used to build the initial model must be set. As seen below:
 
-kf = RepeatedStratifiedKFold(n_splits=10,n_repeats =5, random_state=42)
+kf = RepeatedStratifiedKFold(n_splits=10, n_repeats =5, random_state=42)
 # number - number of folds
 # repeats - number of times the CV is repeated, takes the average of these repeat rounds
 
-# This essentially will split our training data into k groups. For each unique group it will hold out one as a test set
-# and take the remaining groups as a training set. Then, it fits a model on the training set and evaluates it on the test set.
-# Retains the evaluation score and discards the model, then summarizes the skill of the model using the sample of model evaluation scores we choose
+# This essentially will split our training data into k groups. 
+# For each unique group it will hold out one as a test set and take the remaining groups as a training set. 
+# Then, it fits a model on the training set and evaluates it on the test set.
+# Retains the evaluation score and discards the model, 
+# then summarizes the skill of the model using the sample of model evaluation scores we choose
 
 # %%
 #What score do we want our model to be built on? Let's use:
 #AUC for the ROC curve - remember this is measures how well our model distinguishes between classes
 #Recall - this is sensitivity of our model, also known as the true positive rate (predicted pos when actually pos)
 #Balanced accuracy - this is the (sensitivity + specificity)/2, or we can just say it is the number of correctly predicted data points
-print(metrics.SCORERS.keys()) #find them
+
+metrics # let's peek at the metrics we can use
+
 
 # %%
 #Define score, these are the keys we located above. This is what the models will be scored by
@@ -136,7 +147,7 @@ param={"max_depth" : [1,2,3,4,5,6,7,8,9,10,11],
 cl= DecisionTreeClassifier(random_state=1000)
 
 #Set up search for best decisiontreeclassifier estimator across all of our folds based on roc_auc
-search = GridSearchCV(cl, param, scoring=scoring, n_jobs=-1, cv=kf,refit='roc_auc')
+search = GridSearchCV(cl, param, scoring=scoring, n_jobs=5, cv=kf,refit='roc_auc')
 
 
 #%%
@@ -153,14 +164,9 @@ print(best) #depth of 5, good
 
 # %%
 #Creating the decision tree visual for the best estimator 
-dot_data = export_graphviz(best, out_file =None,
-               feature_names =X.columns, #feature names from dataset
-               filled=True, 
-                rounded=True, 
-                class_names = ['ave','excellent']) #classification labels 
-               
-graph=graphviz.Source(dot_data)
-graph #if chunk doesn't print visual, run this speicfic line alone
+plt.figure(figsize=(20,10))
+plot_tree(best, feature_names=X.columns, class_names=['ave', 'excellent'], filled=True, rounded=True)
+plt.show()
 
 # %%
 #What about the specific scores (roc_auc, recall, balanced_accuracy)? Let's try and extract them to see what we are working with ...
