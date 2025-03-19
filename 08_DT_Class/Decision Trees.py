@@ -12,7 +12,7 @@ from sklearn import metrics
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.preprocessing import OrdinalEncoder
 #from sklearn.tree import DecisionTreeClassifier, export_graphviz 
-from sklearn.tree import plot_tree # need to add this one
+from sklearn.tree import plot_tree, DecisionTreeClassifier # need to add this one
 
 # %% [markdown]
 # ### CART Example using Sklearn: Use a new Dataset, complete preprocessing, use three data
