@@ -11,8 +11,7 @@ from sklearn.model_selection import train_test_split,GridSearchCV,RepeatedStrati
 from sklearn import metrics
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.preprocessing import OrdinalEncoder
-#from sklearn.tree import DecisionTreeClassifier, export_graphviz 
-from sklearn.tree import plot_tree, DecisionTreeClassifier # need to add this one
+from sklearn.tree import plot_tree, DecisionTreeClassifier, export_graphviz
 
 # %% [markdown]
 # ### CART Example using Sklearn: Use a new Dataset, complete preprocessing, use three data
@@ -66,6 +65,25 @@ print(winequality["text_rank"].value_counts()) #Great!
 winequality["text_rank"] = winequality["text_rank"].replace({'ave': 0, 'excellent': 1})
 print(winequality["text_rank"].value_counts()) # Check the encoding
 
+
+##############################################################################################################
+#%%
+def preprocess_winequality(df):
+    # Drop missing values
+    df = df.dropna()
+    
+    # Collapse text_rank into two classes
+    df["text_rank"] = df["text_rank"].replace(['good', 'average-ish', 'poor-ish', 'poor'], ['excellent', 'ave', 'ave', 'ave'])
+    
+    # Encode text_rank to become a continuous variable
+    df["text_rank"] = df["text_rank"].replace({'ave': 0, 'excellent': 1})
+    
+    # Drop quality column
+    df = df.drop(columns='quality')
+    
+    return df
+
+winequality = preprocess_winequality(winequality)
 # %%
 #check the prevalence
 print(203/(1279+203)) #of excellent
@@ -78,6 +96,24 @@ print(203/(1279+203)) #of excellent
 
 # %% [markdown]
 # ## Splitting the Data
+
+def split_data(df, target, train_size=0.70, tune_size=0.50, random_state=21):
+    # Split independent and dependent variables
+    X = df.drop(columns=target)
+    y = df[target]
+    
+    # Split data into training and testing sets
+    X_train, X_temp, y_train, y_temp = train_test_split(X, y, train_size=train_size, stratify=y, random_state=random_state)
+    
+    # Split the temporary set into tuning and testing sets
+    X_tune, X_test, y_tune, y_test = train_test_split(X_temp, y_temp, train_size=tune_size, stratify=y_temp, random_state=random_state+28)
+    
+    return X_train, X_tune, X_test, y_train, y_tune, y_test
+
+# Use the function to split the winequality data
+X_train, X_tune, X_test, y_train, y_tune, y_test = split_data(winequality, 'text_rank')
+################################################################################################################
+
 
 # %%
 #split independent and dependent variables 
@@ -95,6 +131,7 @@ X_tune, X_test, y_tune, y_test = train_test_split(X_test,y_test,  train_size = 0
 
 # %% [markdown]
 # ## Let's Build the Model 
+
 
 # %%
 #Three steps in building a ML model
@@ -165,7 +202,7 @@ print(best) #depth of 5, good
 # %%
 #Creating the decision tree visual for the best estimator 
 plt.figure(figsize=(20,10))
-plot_tree(best, feature_names=X.columns, class_names=['ave', 'excellent'], filled=True, rounded=True)
+plot_tree(best, feature_names=X_train.columns, class_names=['ave', 'excellent'], filled=True, rounded=True)
 plt.show()
 
 # %%
@@ -216,8 +253,11 @@ print(plt.plot(final_model.depth,final_model.auc)) #5 does in fact have the high
 
 # %%
 #Variable importance for the best estimator, how much weight does each feature have in determining the classification?
-varimp=pd.DataFrame(best.feature_importances_,index = X.columns,columns=['importance']).sort_values('importance', ascending=False)
+
+varimp = pd.DataFrame(best.feature_importances_, index=X_train.columns, columns=['importance']).sort_values('importance', ascending=False)
 print(varimp)
+
+
 
 # %%
 #Graph variable importance
