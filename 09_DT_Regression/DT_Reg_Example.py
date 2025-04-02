@@ -25,6 +25,22 @@ from sklearn.impute import SimpleImputer
 winequality = pd.read_csv("https://raw.githubusercontent.com/UVADS/DS-3001/main/data/winequality-red-ddl.csv")
 
 # %%
+# Calculate the Big O complexity for a decision tree
+# The complexity of building a decision tree is O(n * m * log(m)), where:
+# n = number of features
+# m = number of samples
+
+n_features = X.shape[1]
+n_samples = X.shape[0]
+
+# Assuming log base 2 for the logarithmic term
+big_o_complexity = n_features * n_samples * np.log2(n_samples)
+
+print(f"Big O complexity for building the decision tree: O({big_o_complexity:.2e})")
+
+
+
+# %%
 #Let's take a look...
 print(winequality.info()) #Some NA's
 
@@ -110,10 +126,10 @@ print(sorted(SCORERS.keys()))
 # %%
 #Step 3: Train the Model
 
-#Regressor model we will use
+#Regressor model we will use, how does this criterion relate to our parameter search?
 reg=DecisionTreeRegressor(random_state=30, criterion='squared_error')
 
-#Set up search for best decisiontreeregressor estimator based on r-sqaured across all the different folds...
+#Set up search for best decision tree regressor estimator based on r-sqaured across all the different folds...
 search = GridSearchCV(reg, param, scoring=scoring, n_jobs=-1, cv=kf,refit='r2')
 
 
